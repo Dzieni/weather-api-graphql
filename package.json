@@ -1,0 +1,14 @@
+{
+	"name": "weather-api-graphql",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Michał Dzienisiewicz",
+	"license": "WTFPL",
+	"devDependencies": {
+		"@tsconfig/node20": "^20.1.2",
+		"prettier": "^3.2.5"
+	}
+}

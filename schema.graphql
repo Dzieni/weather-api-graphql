@@ -1,0 +1,229 @@
+scalar LocationQuery
+scalar DateTime
+scalar LocalDate
+scalar LocalDateTime
+scalar TimeZone
+
+# ISO 632 format
+enum LanguageCode {
+	ar
+	bg
+	bn
+	cs
+	da
+	de
+	el
+	es
+	fi
+	fr
+	hi
+	hu
+	it
+	ja
+	jv
+	ko
+	mr
+	nl
+	pa
+	pl
+	pt
+	ro
+	ru
+	si
+	sk
+	sr
+	sv
+	ta
+	te
+	tr
+	uk
+	ur
+	vi
+	zh
+	zh_cmn
+	zh_hsn
+	zh_tw
+	zh_wuu
+	zh_yue
+	zu
+}
+
+enum TemperatureUnit {
+	C
+	F
+}
+
+enum SpeedUnit {
+	MPH
+	KPH
+}
+
+enum PressureUnit {
+	HPA
+	INCH_HG
+	MB
+}
+
+enum PrecipitationUnit {
+	MM
+	INCH
+}
+
+enum VisibilityUnit {
+	KM
+	MILES
+}
+
+enum CardinalDirection {
+	N
+	S
+	E
+	W
+	NE
+	SE
+	SW
+	NW
+}
+
+type WeatherCondition {
+	# Example: Partly cloudy
+	text: String
+	# Example: //cdn.weatherapi.com/weather/64x64/day/116.png
+	iconUrl: URL
+	code: Int
+}
+
+type AirQuality {
+	co: Float
+	no2: Float
+	o3: Float
+	so2: Float
+	pm2_5: Float
+	pm10: Float
+	epaIndex: Int
+	defraIndex: Int
+}
+
+type Location {
+	name: String
+	region: String
+	country: String
+	latitude: Float
+	longitude: Float
+	timezone: TimeZone
+	localTime: LocalDateTime
+}
+
+interface WeatherResult {
+	cloud: Float
+	condition: WeatherCondition
+	feelsLike(unit: TemperatureUnit): Float
+	humidity: Float
+	isDay: Boolean
+	precipitation(unit: PrecipitationUnit): Float
+	pressure(unit: PressureUnit): Float
+	temperature(unit: TemperatureUnit): Float
+	uvIndex: Int
+	visibility(unit: VisibilityUnit): Float
+	windDegree: Float
+	windDirection: CardinalDirection
+	windGust(unit: SpeedUnit): Float
+	windSpeed(unit: SpeedUnit): Float
+}
+
+type CurrentWeather implements WeatherResult {
+	# implementing WeatherResult
+	cloud: Float
+	condition: WeatherCondition
+	feelsLike(unit: TemperatureUnit): Float
+	humidity: Float
+	isDay: Boolean
+	precipitation(unit: PrecipitationUnit): Float
+	pressure(unit: PressureUnit): Float
+	temperature(unit: TemperatureUnit): Float
+	uvIndex: Int
+	visibility(unit: VisibilityUnit): Float
+	windDegree: Float
+	windDirection: CardinalDirection
+	windGust(unit: SpeedUnit): Float
+	windSpeed(unit: SpeedUnit): Float
+
+	# extra weather-related fields
+	airQuality: AirQuality
+
+	# extra meta
+	updatedAt: DateTime
+}
+
+type HourWeatherForecast implements WeatherResult {
+	# implementing WeatherResult
+	cloud: Float
+	condition: WeatherCondition
+	feelsLike(unit: TemperatureUnit): Float
+	humidity: Float
+	isDay: Boolean
+	precipitation(unit: PrecipitationUnit): Float
+	pressure(unit: PressureUnit): Float
+	temperature(unit: TemperatureUnit): Float
+	uvIndex: Int
+	visibility(unit: VisibilityUnit): Float
+	windDegree: Float
+	windDirection: CardinalDirection
+	windGust(unit: SpeedUnit): Float
+	windSpeed(unit: SpeedUnit): Float
+
+	# extra weather-related fields
+	dewPoint(unit: TemperatureUnit): Float
+	heatIndex(unit: TemperatureUnit): Float
+	willItRain: Boolean
+	chanceOfRain: Float
+	willItSnow: Float
+	chanceOfSnow: Float
+	windChill(unit: TemperatureUnit): Float
+
+	# extra meta
+	localTime: LocalDateTime
+}
+
+type WeatherForecast {
+	date: LocalDate
+	day: DayWeatherForecast
+	hour: [HourWeatherForecast]
+	astro: AstroForecast
+}
+
+type DayWeatherForecast {
+	maxTemperature(unit: TemperatureUnit): Float
+	minTemperature(unit: TemperatureUnit): Float
+	avgTemperature(unit: TemperatureUnit): Float
+	maxWind(unit: SpeedUnit): Float
+	totalPrecipitation(unit: PrecipitationUnit): Float
+	avgVisibility(unit: VisibilityUnit): Float
+	avgHumidity: Float
+	willItRain: Boolean
+	chanceOfRain: Float
+	willItSnow: Float
+	chanceOfSnow: Float
+	condition: WeatherCondition
+	uvIndex: Int
+}
+
+type AstroForecast {
+	sunrise: String
+	sunset: String
+	moonrise: string
+	moonset: string
+	moonPhase: String
+	moonIllumination: String
+}
+
+type Weather {
+	location: Location
+	current: CurrentWeather
+	forecast(days: Int, dateTime: LocalDateTime): WeatherForecast
+	history(dateTime: LocalDateTime): WeatherForecast
+}
+
+type Query {
+	weather(q: LocationQuery!, lang: LanguageCode): Weather
+}
