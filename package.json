@@ -5,20 +5,29 @@
 	"type": "module",
 	"scripts": {
 		"generateApiTypes": "tsx --import dotenv/config weatherApi/generateTypes",
-		"generateApiFixtures": "tsx --import dotenv/config weatherApi/generateFixtures"
+		"generateApiFixtures": "tsx --import dotenv/config weatherApi/generateFixtures",
+		"generateResolverTypes": "graphql-code-generator && prettier --write graphql/__resolverTypes__.ts",
+		"test": "vitest"
 	},
 	"author": "Michał Dzienisiewicz",
 	"license": "WTFPL",
 	"devDependencies": {
+		"@graphql-codegen/cli": "^5.0.2",
+		"@graphql-codegen/typescript": "^4.0.4",
+		"@graphql-codegen/typescript-resolvers": "^4.0.4",
+		"@graphql-tools/executor-http": "^1.0.8",
 		"@tsconfig/node20": "^20.1.2",
 		"@types/node": "^20.11.19",
 		"openapi-typescript": "^6.7.4",
 		"prettier": "^3.2.5",
 		"tsx": "^4.7.1",
-		"typescript": "^5.3.3"
+		"typescript": "^5.3.3",
+		"vitest": "^1.3.1"
 	},
 	"dependencies": {
 		"dotenv": "^16.4.4",
+		"graphql-scalars": "^1.22.4",
+		"graphql-yoga": "^5.1.1",
 		"openapi-fetch": "^0.9.1"
 	}
 }

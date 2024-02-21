@@ -1,8 +1,10 @@
 scalar LocationQuery
+
 scalar DateTime
 scalar LocalDate
-scalar LocalDateTime
+scalar LocalTime
 scalar TimeZone
+scalar URL
 
 # ISO 632 format
 enum LanguageCode {
@@ -83,6 +85,14 @@ enum CardinalDirection {
 	SE
 	SW
 	NW
+	WNW
+	NNW
+	NNE
+	ENE
+	ESE
+	SSE
+	SSW
+	WSW
 }
 
 type WeatherCondition {
@@ -110,43 +120,43 @@ type Location {
 	country: String
 	latitude: Float
 	longitude: Float
-	timezone: TimeZone
-	localTime: LocalDateTime
+	timeZone: TimeZone
+	localTime: LocalTime
 }
 
 interface WeatherResult {
 	cloud: Float
 	condition: WeatherCondition
-	feelsLike(unit: TemperatureUnit): Float
+	feelsLike(unit: TemperatureUnit!): Float
 	humidity: Float
 	isDay: Boolean
-	precipitation(unit: PrecipitationUnit): Float
-	pressure(unit: PressureUnit): Float
-	temperature(unit: TemperatureUnit): Float
+	precipitation(unit: PrecipitationUnit!): Float
+	pressure(unit: PressureUnit!): Float
+	temperature(unit: TemperatureUnit!): Float
 	uvIndex: Int
-	visibility(unit: VisibilityUnit): Float
+	visibility(unit: VisibilityUnit!): Float
 	windDegree: Float
 	windDirection: CardinalDirection
-	windGust(unit: SpeedUnit): Float
-	windSpeed(unit: SpeedUnit): Float
+	windGust(unit: SpeedUnit!): Float
+	windSpeed(unit: SpeedUnit!): Float
 }
 
-type CurrentWeather implements WeatherResult {
+type WeatherCurrent implements WeatherResult {
 	# implementing WeatherResult
 	cloud: Float
 	condition: WeatherCondition
-	feelsLike(unit: TemperatureUnit): Float
+	feelsLike(unit: TemperatureUnit!): Float
 	humidity: Float
 	isDay: Boolean
-	precipitation(unit: PrecipitationUnit): Float
-	pressure(unit: PressureUnit): Float
-	temperature(unit: TemperatureUnit): Float
+	precipitation(unit: PrecipitationUnit!): Float
+	pressure(unit: PressureUnit!): Float
+	temperature(unit: TemperatureUnit!): Float
 	uvIndex: Int
-	visibility(unit: VisibilityUnit): Float
+	visibility(unit: VisibilityUnit!): Float
 	windDegree: Float
 	windDirection: CardinalDirection
-	windGust(unit: SpeedUnit): Float
-	windSpeed(unit: SpeedUnit): Float
+	windGust(unit: SpeedUnit!): Float
+	windSpeed(unit: SpeedUnit!): Float
 
 	# extra weather-related fields
 	airQuality: AirQuality
@@ -159,30 +169,30 @@ type HourWeatherForecast implements WeatherResult {
 	# implementing WeatherResult
 	cloud: Float
 	condition: WeatherCondition
-	feelsLike(unit: TemperatureUnit): Float
+	feelsLike(unit: TemperatureUnit!): Float
 	humidity: Float
 	isDay: Boolean
-	precipitation(unit: PrecipitationUnit): Float
-	pressure(unit: PressureUnit): Float
-	temperature(unit: TemperatureUnit): Float
+	precipitation(unit: PrecipitationUnit!): Float
+	pressure(unit: PressureUnit!): Float
+	temperature(unit: TemperatureUnit!): Float
 	uvIndex: Int
-	visibility(unit: VisibilityUnit): Float
+	visibility(unit: VisibilityUnit!): Float
 	windDegree: Float
 	windDirection: CardinalDirection
-	windGust(unit: SpeedUnit): Float
-	windSpeed(unit: SpeedUnit): Float
+	windGust(unit: SpeedUnit!): Float
+	windSpeed(unit: SpeedUnit!): Float
 
 	# extra weather-related fields
-	dewPoint(unit: TemperatureUnit): Float
-	heatIndex(unit: TemperatureUnit): Float
+	dewPoint(unit: TemperatureUnit!): Float
+	heatIndex(unit: TemperatureUnit!): Float
 	willItRain: Boolean
 	chanceOfRain: Float
-	willItSnow: Float
+	willItSnow: Boolean
 	chanceOfSnow: Float
-	windChill(unit: TemperatureUnit): Float
+	windChill(unit: TemperatureUnit!): Float
 
 	# extra meta
-	localTime: LocalDateTime
+	localTime: LocalTime
 }
 
 type WeatherForecast {
@@ -193,16 +203,16 @@ type WeatherForecast {
 }
 
 type DayWeatherForecast {
-	maxTemperature(unit: TemperatureUnit): Float
-	minTemperature(unit: TemperatureUnit): Float
-	avgTemperature(unit: TemperatureUnit): Float
-	maxWind(unit: SpeedUnit): Float
-	totalPrecipitation(unit: PrecipitationUnit): Float
-	avgVisibility(unit: VisibilityUnit): Float
+	maxTemperature(unit: TemperatureUnit!): Float
+	minTemperature(unit: TemperatureUnit!): Float
+	avgTemperature(unit: TemperatureUnit!): Float
+	maxWind(unit: SpeedUnit!): Float
+	totalPrecipitation(unit: PrecipitationUnit!): Float
+	avgVisibility(unit: VisibilityUnit!): Float
 	avgHumidity: Float
 	willItRain: Boolean
 	chanceOfRain: Float
-	willItSnow: Float
+	willItSnow: Boolean
 	chanceOfSnow: Float
 	condition: WeatherCondition
 	uvIndex: Int
@@ -211,19 +221,36 @@ type DayWeatherForecast {
 type AstroForecast {
 	sunrise: String
 	sunset: String
-	moonrise: string
-	moonset: string
+	moonrise: String
+	moonset: String
 	moonPhase: String
 	moonIllumination: String
 }
 
-type Weather {
+type WeatherCurrentQueryResult {
 	location: Location
-	current: CurrentWeather
-	forecast(days: Int, dateTime: LocalDateTime): WeatherForecast
-	history(dateTime: LocalDateTime): WeatherForecast
+	weather: WeatherCurrent
+}
+
+type WeatherForecastQueryResult {
+	location: Location
+	weather: [WeatherForecast]
 }
 
 type Query {
-	weather(q: LocationQuery!, lang: LanguageCode): Weather
+	weatherCurrent(
+		q: LocationQuery!
+		lang: LanguageCode
+	): WeatherCurrentQueryResult
+	weatherForecast(
+		q: LocationQuery!
+		lang: LanguageCode
+		date: LocalDate!
+	): WeatherForecastQueryResult
+	weatherHistory(
+		q: LocationQuery!
+		lang: LanguageCode
+		date: LocalDate!
+		dateEnd: LocalDate
+	): WeatherForecastQueryResult
 }

@@ -1,0 +1,81 @@
+# Define fragments for common fields and types
+
+# Fragment for common weather condition fields
+fragment WeatherConditionAllFields on WeatherCondition {
+	text
+	iconUrl
+	code
+}
+
+# Fragment for common air quality fields
+fragment AirQualityAllFields on AirQuality {
+	co
+	no2
+	o3
+	so2
+	pm2_5
+	pm10
+	epaIndex
+	defraIndex
+}
+
+fragment AstroForecastAllFields on AstroForecast {
+	sunrise
+	sunset
+	moonrise
+	moonset
+	moonPhase
+	moonIllumination
+}
+
+fragment LocationAllFields on Location {
+	name
+	region
+	country
+	latitude
+	longitude
+	timezone
+	localTime
+}
+
+# Fragment for fields defined by the WeatherResult interface
+fragment WeatherResultAllFields on WeatherResult {
+	cloud
+	condition {
+		...WeatherConditionAllFields
+	}
+	feelsLike(unit: C)
+	humidity
+	isDay
+	precipitation(unit: MM)
+	pressure(unit: HPA)
+	temperature(unit: C)
+	uvIndex
+	visibility(unit: KM)
+	windDegree
+	windDirection
+	windGust(unit: KPH)
+	windSpeed(unit: KPH)
+}
+
+# Fragment for additional fields specific to the WeatherCurrent type
+fragment WeatherCurrentAllFields on WeatherCurrent {
+	...WeatherResultAllFields
+	airQuality {
+		...AirQualityAllFields
+	}
+	updatedAt
+}
+
+# Fragment for additional fields specific to the HourWeatherForecast type
+fragment HourWeatherForecastAllFields on HourWeatherForecast {
+	...WeatherResultAllFields
+	dewPoint(unit: C)
+	heatIndex(unit: C)
+	willItRain
+	chanceOfRain
+	willItSnow
+	chanceOfSnow
+	windChill(unit: C)
+	localTime
+}
